@@ -1,5 +1,6 @@
 const axios = require("axios");
 const loginApi = require('../../conf/login_api');
+const bandListApi = require("../../conf/bandList_api");
 const router = require('express').Router();
 
 router.get('/callback', async (req, res)=>{
@@ -30,8 +31,25 @@ router.get('/callback', async (req, res)=>{
                 response.redirect("/?resultCd=L");
                 return;
             }
-
-            res.render('login/login', {name: body.result_data.name});
+            console.log("사용자 정보 조회 test");
+            return body.result_data.name;
+        })
+        .then(name=>{
+            //밴드 목록 조회 test
+            bandListApi.getBandListUrl(token)
+            .then(bandList=>{
+                console.log("밴드 목록 조회 test");
+                res.render('login/login', {name: name, bandList: bandList.bands});
+            })
+            .catch(error=>{
+                if(error.response){
+                    console.log('cannot fetch Naver band list : ' + error.response.status);
+                } else{
+                    console.log('Error:', error.message);
+                }
+                console.error(error);
+                res.redirect('/?resultCd=L');
+            });
         })
         .catch(error=>{
             if(error.response){

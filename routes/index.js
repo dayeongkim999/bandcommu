@@ -11,8 +11,10 @@ const loginRouter = require('./login/login');
 const app = express();
 const router = express.Router();
 const port = 8080;
+const ex_port = 9131;
 
 app.use('/', router);
+app.use('/login', loginRouter);
 
 const staticPath = path.join(__dirname, '../public');
 app.use(express.static(staticPath));
