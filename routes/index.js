@@ -13,7 +13,6 @@ const router = express.Router();
 const port = 8080;
 
 app.use('/', router);
-app.use('/login', loginRouter);
 
 const staticPath = path.join(__dirname, '../public');
 app.use(express.static(staticPath));
