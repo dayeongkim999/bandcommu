@@ -1,0 +1,18 @@
+<!-- include header -->
+<%- include('./include/_header') %>
+    <!-- /include header -->
+
+    <main>
+        <h3>가입 중 밴드 목록</h3>
+        <ul>
+            <% bandList.forEach(band=> { %>
+                <li>
+                    <%= band.name %>
+                </li> <!-- 각 밴드의 이름을 출력 -->
+                <% }) %>
+        </ul>
+    </main>
+
+    <!-- include footer -->
+    <%- include('./include/_footer') %>
+<!-- /include footer -->

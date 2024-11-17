@@ -1,15 +1,17 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>Index page</title>
-</head>
-<body>
+<!-- include header -->
+<%- include('./include/_header') %>
+  <!-- /include header -->
+
+  <main>
     <h3 class="text-c">네이버밴드에 지금 로그인해보세요</h3>
-<div style="text-align:center;">
-  <a href="<%=bandLoginUrl%>" data-ajax="false">
-    <img src='/images/btnBandLogin.png' alt="네이버밴드 로그인버튼" style="height:40px;"/>
-  </a>
-</div>
-</body>
-</html>
+    <div style="text-align:center;">
+      <a href="<%=bandLoginUrl%>" data-ajax="false">
+        <img src='/images/btnBandLogin.png' alt="네이버밴드 로그인버튼" style="height:40px;" />
+      </a>
+    </div>
+
+  </main>
+
+  <!-- include footer -->
+  <%- include('./include/_footer') %>
+    <!-- /include footer -->

@@ -4,8 +4,12 @@ const axios = require("axios");
 const bandListApi = {
     getBandListUrl: async function (access_token) {
         const bandListUrl = loginApi.BAND_LIST_URL + '?access_token=' + access_token;
+        const options = {
+            url: bandListUrl,
+            headers: { Authorization: 'Bearer ' + access_token } // Bearer 토큰 설정
+        };
         try {
-            const response = await axios(bandListUrl);
+            const response = await axios(options);
             const result_code = response.data.result_code;
             const body = response.data.result_data;
             
