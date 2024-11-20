@@ -9,6 +9,7 @@ const session = require('express-session');
 const MongoStore = require("connect-mongo");
 const helmet = require('helmet');
 const cors = require("cors");
+const methodOverride = require("method-override");
 const dbConnect = require("./conf/dbConnect");
 
 const app = express();
@@ -18,7 +19,11 @@ const ex_port = 9131;
 
 dbConnect();
 
+app.options('*', cors()); // OPTIONS 요청 허용
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded());
+app.use(methodOverride("_method"));
 
 app.set('view engine', 'ejs');
 app.set('views', './views');

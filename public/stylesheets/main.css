@@ -1,0 +1,106 @@
+@font-face {
+    font-family: 'Paperlogy-1Thin';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-1Thin.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Paperlogy-2ExtraLight';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-2ExtraLight.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Paperlogy-3Light';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-3Light.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Paperlogy-4Regular';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-4Regular.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Paperlogy-5Medium';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Paperlogy-6SemiBold';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-6SemiBold.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Paperlogy-7Bold';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-7Bold.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Paperlogy-8ExtraBold';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Paperlogy-9Black';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-9Black.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+
+:root{
+    --global-font: 'Paperlogy-4Regular', sans-serif;
+    --global-titlefont: 'Paperlogy-5Medium', sans-serif;
+    --global-color: #74BA77;
+    --global-darkcolor: #528F5A;
+}
+
+body{
+    font-family: var(--global-font);
+    min-height: 100vh; /* 뷰포트 전체 높이 */
+}
+
+#title{
+    font-family: 'Paperlogy-8ExtraBold', sans-serif;
+}
+
+
+._body_background{
+    display: flex;
+    justify-content: center;
+    background-color: whitesmoke;
+}
+
+.custom_nav{
+    width: 800px;
+}
+
+._footer{
+    width: 800px;
+    background-color: darkslategray;
+    color: white;
+}
+
+
+@media (max-width: 800px) {
+    .custom_nav {
+        max-width: 100%; /* 부모 너비에 맞게 확장 */
+        width: 100%; /* 가로 크기를 100%로 설정 */
+        margin: 0; /* 여백 제거 */
+    }
+    ._footer{
+        max-width: 100%; /* 부모 너비에 맞게 확장 */
+        width: 100%; /* 가로 크기를 100%로 설정 */
+        margin: 0; /* 여백 제거 */
+    }
+    main{
+        max-width: 100%; /* 부모 너비에 맞게 확장 */
+        width: 100%; /* 가로 크기를 100%로 설정 */
+        margin: 0; /* 여백 제거 */
+    }
+}

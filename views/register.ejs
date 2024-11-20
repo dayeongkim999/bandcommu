@@ -1,0 +1,50 @@
+<!-- include head -->
+<%- include('./include/_head') %>
+  <!-- /include head -->
+  <link href="/stylesheets/register.css" rel="stylesheet">
+  <script src="/javascripts/register.js" defer></script>
+
+<!-- include header -->
+<%- include('./include/_header') %>
+    <!-- /include header -->
+
+    <main>
+        <div class="registerBodyView">
+            <!--타이틀-->
+            <div class="registerTitle">
+                <h3>관리자 페이지</h3>
+            </div>
+            <!--등록 폼-->
+            <div class="registerPage">
+                <h3 class="registerSubtitle">유저 등록</h3>
+                <form id="registerUser" class="register" method="POST" onsubmit="registerUser(event)">
+                    <div class="form-floating">
+                    <textarea class="form-control" name="nickname" placeholder="이름을 입력해주세요" id="floatingTextarea" ></textarea>
+                    <label for="floatingTextarea">이름</label>
+                    <button type="submit" class="btn btn-primary btn-lg loginButton">등록</button>
+                    </div>
+                </form>
+            </div>
+            <!--유저 목록-->
+            <div class="userListBody">
+                <h3 class="registerSubtitle">유저 목록</h3>
+                <ul class="userList">
+                    <% users.forEach(user => { %>
+                        <li id="user-<%= user._id %>">
+                            <strong>ID:</strong> <%= user._id %> | 
+                            <strong>Nickname:</strong> <%= user.nickname %> |
+                            <strong>Verified:</strong> <%= user.isVerified ? "Yes" : "No" %> | 
+                            <strong>Last Access:</strong> <%= user.lastAccess %>
+                            <form action="/login/users/<%= user._id %>?_method=DELETE" method="POST" style="display:inline;" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
+                                <button type="submit" class="btn btn-danger btn-lg" onclick="deleteUser(event, '<%= user._id %>')">삭제</button>
+                            </form>
+                        </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- include footer -->
+    <%- include('./include/_footer') %>
+<!-- /include footer -->

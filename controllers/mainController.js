@@ -4,7 +4,7 @@ bandListApi
 
 const getMain = async (req, res) => {
     //밴드 목록 조회
-    bandListApi.getBandListUrl(req.session.token)
+    bandListApi.getBandListUrl(req.session.access_token)
         .then(bandList => {
             console.log("밴드 목록 조회 test");
             res.render('main', { bandList: bandList.bands });

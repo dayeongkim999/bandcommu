@@ -1,17 +1,41 @@
-<!-- include header -->
-<%- include('./include/_header') %>
-  <!-- /include header -->
+<!-- include head -->
+<%- include('./include/_head') %>
+  <!-- /include head -->
 
-  <main>
-    <h3 class="text-c">네이버밴드에 지금 로그인해보세요</h3>
-    <div style="text-align:center;">
-      <a href="<%=bandLoginUrl%>" data-ajax="false">
-        <img src='/images/btnBandLogin.png' alt="네이버밴드 로그인버튼" style="height:40px;" />
-      </a>
-    </div>
+  <link href="stylesheets/index.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js" integrity="sha512-DNI/FJdkfyeuPUal7lDkRVg0mFY2n4IZJJYqPbQWLL0COxLi6G6nmf5gr1vW1Bd4wYC09hOvZVsSclfXxUTU/w==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script src="/javascripts/index.js" defer></script>
+  <!-- include header -->
+  <%- include('./include/_header') %>
+    <!-- /include header -->
 
-  </main>
+    <main class="_body_background">
+      <div class="IntroBodyView">
+        <div class="introLogin">
+          <h2 class="introTitle">운영이 쉬워진다!</h2>
+          <p class="introSummary">밴드 커뮤 전용 운영 지원 사이트입니다. <br> 모바일은 일부 기능이 제한적입니다.</p>
+          <span>최초 접속에 한해 인증 코드 입력이 필요합니다! <br> 인증을 한 적이 있으시다면 이름만 입력해주세요!</span>
+          <form id="authForm" class="authcode" action="/login/auth" method="POST">
+            <div class="form-floating">
+              <textarea class="form-control" name="nickname" placeholder="이름을 입력해주세요" id="floatingTextarea"></textarea>
+              <label for="floatingTextarea">이름</label>
+            </div>
+            <div class="form-floating">
+              <textarea class="form-control" name="authcode" placeholder="인증 코드를 입력해주세요" id="floatingTextarea"></textarea>
+              <label for="floatingTextarea">인증 코드</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg loginButton">인증 후 Band로 로그인</button>
+          </form>
+        </div>
+        <div class="introGuide">
+          
+        </div>
+        <div class="introDeveloper">
 
-  <!-- include footer -->
-  <%- include('./include/_footer') %>
-    <!-- /include footer -->
+        </div>
+      </div>
+    </main>
+
+    <!-- include footer -->
+    <%- include('./include/_footer') %>
+      <!-- /include footer -->

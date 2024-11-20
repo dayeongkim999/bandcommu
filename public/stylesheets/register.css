@@ -1,0 +1,49 @@
+main{
+    display: flex;
+    justify-content: center; /* 콘텐츠 중앙 정렬 */
+    align-items: center; /* 콘텐츠 수직 중앙 정렬 */
+    background-color: whitesmoke;
+}
+
+.registerBodyView{
+    display: flex;
+    flex-direction: column;
+    width: 800px;
+    background-color: white;
+ /* 수평 수직 중앙 정렬하기 */
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.registerTitle{
+    margin: 20px 0 0 0;
+}
+
+.registerSubtitle{
+    
+}
+
+.registerPage{
+}
+
+.userListBody{
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 0 20px;
+    gap: 20px;
+}
+
+.userList{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+@media (max-width: 800px) {
+    .registerBodyView {
+        max-width: 100%; /* 부모 너비에 맞게 확장 */
+        width: 100%; /* 가로 크기를 100%로 설정 */
+        margin: 0; /* 여백 제거 */
+    }
+}
