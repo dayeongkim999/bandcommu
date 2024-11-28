@@ -1,0 +1,31 @@
+.container-fluid {
+    display: flex; /* 플렉스박스를 사용해 아이템을 한 줄에 배치 */
+    align-items: center; /* 세로 방향 정렬 */
+    gap: 10px; /* 아이콘과 이름 사이 간격 */
+}
+
+.back-icon {
+    color: #808080; /* 글씨 색상을 검은색으로 설정 */
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.groupBandMenuList{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    list-style: none; /* 리스트 점 제거 */
+}
+
+._linkLnbMenu{
+    text-decoration: none; /* 밑줄 제거 */
+    color: black; /* 글씨 색상을 검은색으로 설정 */
+}
+
+.sf_color{
+    color: var(--global-color);
+}
+
+.sf_tAfterBg{
+    border-bottom: 2px solid var(--global-color);
+}

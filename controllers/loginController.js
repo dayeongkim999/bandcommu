@@ -57,6 +57,8 @@ const getLogin = async (req, res) => {
                  `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
         //token 발급 시간 db에 업뎃
         updateAccessTime(user, accessTime);
+        
+        
 
         //메인으로
         res.redirect('/main');

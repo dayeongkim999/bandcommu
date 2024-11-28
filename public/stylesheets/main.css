@@ -63,18 +63,18 @@
 body{
     font-family: var(--global-font);
     min-height: 100vh; /* 뷰포트 전체 높이 */
+    background-color: whitesmoke;
+}
+
+main{
+    width: 800px;
+    min-height: 100vh; 
 }
 
 #title{
     font-family: 'Paperlogy-8ExtraBold', sans-serif;
 }
 
-
-._body_background{
-    display: flex;
-    justify-content: center;
-    background-color: whitesmoke;
-}
 
 .custom_nav{
     width: 800px;
@@ -85,6 +85,17 @@ body{
     background-color: darkslategray;
     color: white;
 }
+
+.IntroBodyView{
+    display: flex;
+    flex-direction: column;
+    width: 800px;
+    background-color: white;
+ /* 수평 수직 중앙 정렬하기 */
+    align-items: center;
+    justify-content: center;
+}
+
 
 
 @media (max-width: 800px) {
@@ -99,6 +110,11 @@ body{
         margin: 0; /* 여백 제거 */
     }
     main{
+        max-width: 100%; /* 부모 너비에 맞게 확장 */
+        width: 100%; /* 가로 크기를 100%로 설정 */
+        margin: 0; /* 여백 제거 */
+    }
+    .IntroBodyView {
         max-width: 100%; /* 부모 너비에 맞게 확장 */
         width: 100%; /* 가로 크기를 100%로 설정 */
         margin: 0; /* 여백 제거 */

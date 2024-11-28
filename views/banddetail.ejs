@@ -1,0 +1,46 @@
+<!-- include head -->
+<%- include('./include/_head') %>
+    <!-- /include head -->
+    <link href="/stylesheets/banddetail.css" rel="stylesheet">
+    </head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+   <!-- Header -->
+  <div class="_body_background">
+   <nav class="navbar custom_nav" style="background-color: #74BA77;">
+    <div class="container-fluid">
+        <a href="/main" class="back-icon" role="button">
+            &#60; <!-- '<' 아이콘 -->
+        </a>
+        <span class="band-name"><%= bandname %></span>
+    </div>
+  </nav>
+  <div class="groupBandMenuSection custom_nav"> 
+    <ul class="groupBandMenuList">
+        <li class="groupBandMenuItem">
+            <a href="/main/<%= bandkey %>" class="_linkLnbMenu groupBandMenuLink sf_color sf_tAfterBg">통계</a>
+        </li>
+        <li class="groupBandMenuItem">
+            <a href="/main/<%= bandkey %>/pairgame" class="_linkLnbMenu groupBandMenuLink">페어게임</a>
+        </li>
+        <li class="groupBandMenuItem">
+            <a href="/main/<%= bandkey %>/dice" class="_linkLnbMenu groupBandMenuLink">다이스</a>
+        </li>
+    </ul>
+  </div>
+</div>
+  <!-- /Header -->
+        <main>
+            <div class="IntroBodyView">
+            <div>
+
+            </div>
+            <div>
+                
+            </div>
+        </div>
+        </main>
+
+        <!-- include footer -->
+        <%- include('./include/_footer') %>
+            <!-- /include footer -->

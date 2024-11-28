@@ -1,22 +1,33 @@
 <!-- include head -->
 <%- include('./include/_head') %>
-  <!-- /include head -->
+    <!-- /include head -->
+    <link href="stylesheets/mainpage.css" rel="stylesheet">
+    <!-- include header -->
+    <%- include('./include/_header') %>
+        <!-- /include header -->
 
-<!-- include header -->
-<%- include('./include/_header') %>
-    <!-- /include header -->
+        <main>
+            <div class="IntroBodyView">
+            <h3>가입 중 밴드 목록</h3>
+            <div class="container">
+                <ul class="bandCardList">
+                <% bandList.bands.forEach(function(band) { %>
+                    <li class="bandCardItem">
+                        <div class="band">
+                            <a href="/main/<%= band.band_key %>" role="button" class="bandinvite_link">
+                                <img src="<%= band.cover %>" alt="<%= band.name %> Cover">
+                                <div class="band-name">
+                                    <%= band.name %>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+                    <% }); %>
+                </ul>
+            </div>
+        </div>
+        </main>
 
-    <main>
-        <h3>가입 중 밴드 목록</h3>
-        <ul>
-            <% bandList.forEach(band=> { %>
-                <li>
-                    <%= band.name %>
-                </li> <!-- 각 밴드의 이름을 출력 -->
-                <% }) %>
-        </ul>
-    </main>
-
-    <!-- include footer -->
-    <%- include('./include/_footer') %>
-<!-- /include footer -->
+        <!-- include footer -->
+        <%- include('./include/_footer') %>
+            <!-- /include footer -->
