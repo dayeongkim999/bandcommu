@@ -3,22 +3,21 @@ const bandListApi = require("../services/bandList_api");
 const contentListApi = require("../services/contentList_api");
 
 const getMain = async (req, res) => {
-    //밴드 목록 조회
-    await bandListApi.getBandListUrl(req.session.access_token)
-        .then(bandList => {
-            console.log("밴드 목록 조회 test");
-            res.render('main', { bandList: bandList });
-        })
-        .catch(error => {
-            if (error.response) {
-                console.log('cannot fetch Naver band list : ' + error.response.status);
-            } else {
-                console.log('Error:', error.message);
-            }
-            console.error(error);
-            res.redirect('/?resultCd=L');
-        });
-}
+    try {
+        // 밴드 목록 조회
+        const bandList = await bandListApi.getBandListUrl(req.session.access_token);
+        console.log("밴드 목록 조회 성공");
+        res.render('main', { bandList });
+    } catch (error) {
+        if (error.response) {
+            console.log('Cannot fetch Naver band list: ' + error.response.status);
+        } else {
+            console.log('Error:', error.message);
+        }
+        console.error(error);
+        res.redirect('/?resultCd=L'); // 실패 시 리다이렉트
+    }
+};
 
 const getBandPage = async (req, res) => {
     const bandKey = req.params.band_key; // URL에서 band_key 추출
@@ -53,8 +52,15 @@ const getBandPairGame = async (req, res)=>{
 
         console.log("밴드 페어게임 조회 test");
 
-        // 글 목록 가져오기
-        const contentList = await contentListApi.getContentList(req.session.access_token, bandKey);
+        // 공지 목록 가져오기
+        const contentList = await contentListApi.getNoticeList(req.session.access_token, bandKey);
+        if (contentList.length === 0) {
+            contentList.push({
+                author: { name: "서비스 관리자" },
+                content: "앗! 이틀 이내 #공지 글이 없어요!",
+                created_at: 0
+            });
+        }
         console.log('Content List:', contentList);
         // 렌더링
         res.render('bandpairgame', {

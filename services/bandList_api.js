@@ -15,7 +15,9 @@ const bandListApi = {
             
             if (result_code !== 1) {
                 console.log('Naver band list get error');
-                return { redirect: "/?resultCd=L" }; // 실패 시 리다이렉트 경로 반환
+                console.log('Unexpected result_code:', result_code);
+                console.log('Full response:', response);
+            return;
             }
     
             return body; // 성공 시 데이터 반환
