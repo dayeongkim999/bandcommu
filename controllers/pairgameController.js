@@ -149,8 +149,8 @@ async function getPairgameData(req, res) {
 async function getPairgameCompleteLink(req, res) {
     try {
         //해당 공지 글의 찌름 마감 시간이 지났나 확인
-        const bandKey = req.session.band_key;
-        const postKey = req.session.notice_id;
+        const bandKey = req.params.band_key;
+        const postKey = req.params.post_key;
         const link = await findTempLinkbyBandKey(bandKey);
         const access_restricted_at = link.access_restricted_at;
         const now = new Date();
