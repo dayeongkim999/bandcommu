@@ -45,6 +45,9 @@ async function registerUser(event) {
     }
 }
 
+document.getElementById("registerForm").addEventListener("submit", registerUser, { once: true });
+
+
 async function deleteUser(event, userId) {
     event.preventDefault(); // 기본 폼 동작 방지
 
