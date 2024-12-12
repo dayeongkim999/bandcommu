@@ -29,6 +29,7 @@ const getLogin = async (req, res) => {
 
         req.session.access_token = data.access_token;
         const user_key = data.user_key;
+        const nickname = req.session.nickname;
 
         //밴드 로그인 성공 시
         //접속 경로 구분
