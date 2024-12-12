@@ -5,7 +5,8 @@ const {
     getExternalPairform,
     getExternalPairgame,
     getExternalPairformLink,
-    postExternalPairform
+    postExternalPairform,
+    getExternalExpired
 } = require("../controllers/externalformController")
 
 
@@ -15,5 +16,6 @@ router.route("/pairformlink").get(getExternalPairformLink);
 router.route("/pairform/:notice_id/:band_key")
     .get(checkBand, getExternalPairform)
     .post(checkBand, postExternalPairform);
+router.route("/expired").get(getExternalExpired);
 
 module.exports = router;

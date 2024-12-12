@@ -39,22 +39,9 @@
         <main>
             <div class="IntroBodyView">
             <div class="bandMemberArea">
-                <h1>페어게임 찌름 현황</h1>
-
-                <div class="status-container">
-                    <div id="pairgame-status" class="status">
-                        <div id="time-info">
-                            <p>현재 시각: <span id="current-time"><%= new Date().toLocaleString() %></span></p>
-                            <p>찌름 마감 시간: <span id="deadline-time">로딩 중...</span></p>
-                        </div>
-                        <div>
-                            <button class="btn btn-primary" id="access-button" disabled>결과 확인 후 글 작성하기</button>
-                        </div>
-                        <a href="https://localhost:8080<%= link%>" class="">https://localhost:8080<%= link%></a>
-                        <ul id="pairgame-list" class="list-group">
-                            <!-- AJAX로 데이터 로드 -->
-                        </ul>
-                    </div>
+                <h1>페어게임 결과</h1>
+                <div class="content">
+                    <p class="content"><%- formattedContent %></p>
                 </div>
             </div>
         </div>

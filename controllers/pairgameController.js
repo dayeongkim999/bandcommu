@@ -1,17 +1,15 @@
-const {TempLink, createTempLink, handleTempLink, findTempLinkbyBandKey} = require("../models/templinkModel");
+const { TempLink, createTempLink, handleTempLink, findTempLinkbyBandKey } = require("../models/templinkModel");
 const {
     PairStatus,
-    createPair,
     getPairsInEarlyOrder,
-    getPairsExcludedSelfPair, 
-    findSelfPair} = require('../models/pairstatusModel');
+    makeFinalPairs } = require('../models/pairstatusModel');
 const bandListApi = require("../services/bandList_api");
 const contentListApi = require("../services/contentList_api");
-const { getAllParticipants } = require("../services/commentList_api");
-
+require('dotenv').config();
+const baseUrl = process.env.BASE_URL
 
 //페어게임
-const getBandPairGame = async (req, res)=>{
+const getBandPairGame = async (req, res) => {
     try {
         const bandKey = req.params.band_key; // URL에서 band_key 추출
         //만약 해당 band에서 이미 페어게임 링크를 발부했다면(DB check)
@@ -28,7 +26,7 @@ const getBandPairGame = async (req, res)=>{
         const band = bandList.bands.find(b => b.band_key === bandKey); // 해당 밴드 찾기
         req.session.band_cover = band.cover;
         req.session.band_name = band.name;
-        
+
         if (!band) {
             console.log('Band not found');
             return res.redirect('/?resultCd=L'); // 밴드가 없으면 리다이렉트
@@ -40,14 +38,14 @@ const getBandPairGame = async (req, res)=>{
         // 만약 페어게임 신청을 진행했던 글이 있다면 최상단에 표시, 누르면 글 작성 화면으로 이동
 
         // 공지 목록 불러오기
-        const day = 4;
+        const day = 6;
         const noticeList = await contentListApi.getNoticeList(req.session.access_token, bandKey, day);
-        
+
         //공지가 없다면
         if (noticeList.length === 0) {
             noticeList.push({
                 author: { name: "서비스 관리자" },
-                content: "앗!" +day+"일 이내 #공지 글이 없어요!",
+                content: "앗!" + day + "일 이내 #공지 글이 없어요!",
                 created_at: Date.now(),
             });
         }
@@ -69,8 +67,8 @@ const getBandPairGame = async (req, res)=>{
     }
 }
 //페어게임 신청 현황 화면
-const getBandPairGameNow = async (req, res)=>{
-    try{
+const getBandPairGameNow = async (req, res) => {
+    try {
         const bandKey = req.params.band_key; // URL에서 band_key 추출
         const postKey = req.params.post_key; // URL에서 post_key 추출
         const bandCover = req.session.band_cover; //세션에서 밴드 커버 추출
@@ -82,7 +80,8 @@ const getBandPairGameNow = async (req, res)=>{
         if (!existingURL) {
             // 존재하지 않으면 링크 생성
             const noticeId = postKey
-            existingURL = await createTempLink(noticeId, bandKey, bandCover, bandName);
+            const expired_hour = 23, expired_minute = 59, access_hour = 2, access_minute = 51;
+            existingURL = await createTempLink(noticeId, bandKey, bandCover, bandName, expired_hour, expired_minute, access_hour, access_minute);
         }
 
         const bandList = await bandListApi.getBandListUrl(req.session.access_token);
@@ -91,8 +90,8 @@ const getBandPairGameNow = async (req, res)=>{
 
         // 있을 시
         // 렌더링
-        res.render('bandpairgamenow', {bandKey, postKey, bandname: band.name, expires_at: existingURL.expires_at, link});
-    } catch(error){
+        res.render('bandpairgamenow', { bandKey, postKey, bandname: band.name, expires_at: existingURL.expires_at, link });
+    } catch (error) {
         if (error.response) {
             console.log('Error fetching notice data: ' + error.response.status);
         } else {
@@ -115,12 +114,13 @@ async function getPairStatus(postKey) {
 }
 
 
-// 마감 시간 반환
+// 찌름 마감 시간 반환
 async function getDeadline(req, res) {
     try {
-        const tempLink = await TempLink.findOne(); // 예: 가장 최근 마감 링크 가져오기
+        const band_key = req.session.band_key;
+        const tempLink = await findTempLinkbyBandKey(band_key);
         if (tempLink) {
-            res.json({ expires_at: tempLink.expires_at });
+            res.json({ access_restricted_at: tempLink.access_restricted_at });
         } else {
             res.status(404).json({ error: 'No deadline found' });
         }
@@ -146,34 +146,75 @@ async function getPairgameData(req, res) {
     }
 }
 
+async function getPairgameCompleteLink(req, res) {
+    try {
+        //해당 공지 글의 찌름 마감 시간이 지났나 확인
+        const bandKey = req.session.band_key;
+        const postKey = req.session.notice_id;
+        const link = await findTempLinkbyBandKey(bandKey);
+        const access_restricted_at = link.access_restricted_at;
+        const now = new Date();
+        //지났다면 링크 반환
+        if (access_restricted_at <= now) {
+            res.json({
+                status: 'success',
+                message: '결과를 확인합니다.',
+                result: `${baseUrl}/main/${bandKey}/pairgame/${postKey}/complete` // 완료 페이지 링크
+            });
+        } else {
+            //안 지났다면 본래 링크 반환
+            res.json({
+                status: 'failed',
+                message: '찌름 마감 기한이 지나지 않아 접근 불가능합니다.',
+                result: ''
+            });
+        }
+    }
+    catch (error) {
+        console.error('Error fetching pair game complete link:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
 
-// 삭제된 문서 처리 함수
-async function matchingPair(band_key, post_key) {
+async function getBandPairGameComplete(req, res){
     try{
-        //페어 매칭 저장
-        let matches = [];
-
-        //자찌름 페어
-        const selfPairs = await findSelfPair(post_key);
-        for (const pair of selfPairs) {
-            // pair는 MongoDB에서 조회한 문서 객체
-            // 문서 안의 user_name 필드에 접근 가능
-            matches.push([pair.user_name, pair.user_name]);
-        }        
-
-        //자찌름 페어 제외 목록
-        let pairExcludedSelf = await getPairsExcludedSelfPair(post_key);
-
-        //맞찌름 처리
-
-        
-        //선찌름 처리
-        //나머지 랜덤 처리
-        //매칭된 페어 목록 반환
+        //글 작성
+        const band_key = req.params.band_key;
+        const post_key = req.params.post_key;
+        const bandname = req.session.band_name;
+        const access_token = req.session.access_token;
+        const content = await writingPair(access_token, band_key, post_key);
+        const formattedContent = content.replace(/\n/g, '<br>');
+        //화면에 보여줌
+        res.render('bandpairgameresult', {formattedContent, bandKey: band_key, postKey: post_key, bandname});
     } catch(error){
+        console.error('Error get pair game complete:', error);
+    }
+}
 
+// 초고 작성 함수
+async function writingPair(access_token, band_key, post_key) {
+    try {
+        //랜덤 페어 만들기
+        const matched = await makeFinalPairs(access_token, band_key, post_key);
+        console.log(`matched pair ${matched}`);
+
+        //글 작성
+        // 페어를 문자열로 변환
+        const formattedPairs = matched.map(pair => {
+            const userKeys = pair.map(p => `@${p.author.name}`).join(" - ");
+            return userKeys;
+        });
+
+        // 글 작성 (formattedPairs를 활용)
+        const postContent = formattedPairs.join("\n");
+        console.log("Post content:\n", postContent);
+
+        return postContent;
+    } catch (error) {
+        console.error("Error in writingPair:", error);
     }
 }
 
 
-module.exports = {getBandPairGame, getBandPairGameNow, getPairStatus, getDeadline, getPairgameData, matchingPair }
+module.exports = { getBandPairGame, getBandPairGameNow, getPairStatus, getDeadline, getPairgameData, writingPair, getPairgameCompleteLink, getBandPairGameComplete }

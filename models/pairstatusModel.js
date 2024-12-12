@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const { getAllParticipants } = require('../services/commentList_api');
+const commentListApi = require('../services/commentList_api');
+const findTagInPosts = require('../services/postParser');
 
 const pairStatusSchema = new mongoose.Schema({
     band_key: { type: String, required: true }, //밴드 키
@@ -87,7 +88,7 @@ async function findSelfPairs(post_key) {
             post_key,
             $expr: { $eq: ["$user_key", "$opponent_key"] }
         });
-
+        
         if (!pairs || pairs.length === 0) {
             console.log(`No self pair`);
         }
@@ -104,15 +105,16 @@ async function getPairsExcludedSelfPairs(post_key) {
     try {
         // find()로 모든 문서 가져오고, sort()로 updatedAt 오름차순 정렬
         let pairs = await PairStatus.find({ post_key: post_key }).sort({ updatedAt: 1 }); // 1은 오름차순(이른 순)
-
         // 자찌름 페어 가져오기
         const selfPairs = await findSelfPairs(post_key);
 
         // 자찌름 페어가 있으면 pairs에서 제외
-        if (selfPairs) {
-            pairs = pairs.filter(p => p._id.toString() !== selfPairs._id.toString());
+        if (selfPairs.length > 0) {
+            pairs = pairs.filter(p => {
+                // selfPairs 중 p와 같은 _id를 가진 항목이 있는지 확인
+                return !selfPairs.some(sp => p._id.toString() === sp._id.toString());
+            });
         }
-
         return pairs;
     } catch (error) {
         console.error('Error fetching pairs excluded self pairs:', error);
@@ -200,6 +202,7 @@ async function findOnesidedPairs(post_key) {
     try {
         //자찌름 제외 맞찌름 제외 찌름 목록 불러오기
         let pairs = await getPairsExcludedMutualPairs(post_key);
+        if(!pairs) return [];
         //updatedAt으로 오름차순으로 정렬
         pairs.sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt));
 
@@ -216,7 +219,7 @@ async function findOnesidedPairs(post_key) {
             pairsKey.push(pair[1].opponent_key);
         })
 
-        let forbiddenId = [];
+        let successId = [];
         pairs.forEach(pair => {
             //실패: 자찌름으로 이미 짝 존재
             //실패: 맞찌름으로 이미 짝 존재
@@ -236,13 +239,13 @@ async function findOnesidedPairs(post_key) {
                 //유저와 상대 키를 이미 짝이 맺어진 pairsKey에 추가
                 pairsKey.push(pair.user_key);
                 pairsKey.push(pair.opponent_key);
+                successId.push(pair._id.toString());
             }
 
         })
-
         // 선찌름 된 페어 목록 반환
         // forbiddenId 배열에 포함된 _id들을 제외한 pairs 배열 생성
-        pairs = pairs.filter(pair => !forbiddenId.includes(pair._id.toString()));
+        pairs = pairs.filter(pair => successId.includes(pair._id.toString()));
         return pairs;
     } catch (error) {
         console.error('Error finding one sided pairs:', error);
@@ -255,8 +258,7 @@ async function checkParticipate(checkPairs, participants) {
             return []; // checkPairs가 비어있거나 배열이 아닌 경우 빈 배열 반환
         }
 
-        const participantKeys = new Set(participants.map(p => p.user_key));
-
+        const participantKeys = new Set(participants.map(p => p.author.user_key));
         if (Array.isArray(checkPairs[0])) {
             // checkPairs가 2차원 배열인 경우
             return checkPairs.filter(subArray =>
@@ -264,7 +266,8 @@ async function checkParticipate(checkPairs, participants) {
             );
         } else {
             // checkPairs가 1차원 배열인 경우
-            return checkPairs.filter(pair => participantKeys.has(pair.user_key));
+            return checkPairs.filter(pair => {
+                return participantKeys.has(pair.user_key) && participantKeys.has(pair.opponent_key)});
         }
     }
     catch (error) {
@@ -290,34 +293,37 @@ async function createRandomPairs(participants) {
 async function makeFinalPairs(access_token, band_key, post_key) {
     try {
         //전체 데이터 불러오기
-        let participants = await getAllParticipants(access_token, band_key, post_key);
+        let participants = await commentListApi.getAllParticipants(access_token, band_key, post_key);
         //홀수 참여 불러오기
         let oddAddItems = await findTagInPosts(participants, '#홀수참여') || [];
         //전체 데이터에서 홀수 참여 제외
         participants = participants.filter(participant =>
-            !oddAddItems.some(oddItem => oddItem.user_key === participant.user_key)
+            !oddAddItems.some(oddItem => {
+                return oddItem.author.user_key === participant.author.user_key;})
         );
         //자찌름 불러오기 [a, b, c]
         let selfPairs = await findSelfPairs(post_key);
         //자찌름 목록 중 중도삭제자 제외, 참여자만 남김
-        selfPairs = await checkParticipate(selfPairs, participants);
-
+        selfPairs = await checkParticipate(selfPairs, participants) || [];
         //전체 데이터 수-자찌름 수가 홀수인지 확인
         if ((participants.length - selfPairs.length) % 2 == 1) {
             //홀수라면 #홀수참여 참여시키기
             let count = oddAddItems.length;
             //홀수 참여 인원이 홀수라면 전원 참가
-            //짝수면서 1명 이상이라면 마지막 인원 제외 참가
-            if (count % 2 == 0 && count > 0) {
+            //짝수면서 1명 이상이라면 마지막 인원 제외 참가            
+            if(count % 2 === 1){
+                participants = participants.concat(oddAddItems);
+            }
+            else if (count % 2 === 0 && count > 0) {
                 // oddAddItems의 첫 번째 값 가져오기 (마지막 인원)
                 const lastPerson = oddAddItems[0];
                 // 참여자에서 lastPerson을 제외
-                participants = participants.concat(oddAddItems)
+                participants = participants.concat(oddAddItems);
                 participants = participants.filter(author => author !== lastPerson);
             }
 
             //그럼에도 여전히 홀수라면
-            if (commentAuthors.length % 2 == 1) {
+            if (participants.length % 2 == 1) {
                 //#홀수제외 목록 불러오기
                 let oddMinusItems = await findTagInPosts(participants, '#홀수제외') || [];
                 //홀수 제외-가장 먼저 단 1명 제외
@@ -325,21 +331,19 @@ async function makeFinalPairs(access_token, band_key, post_key) {
                     // oddMinusItems의 첫 번째 값 가져오기 (마지막 인원)
                     const lastPerson = oddMinusItems[oddMinusItems.length - 1];
                     // commentAuthors에서 lastPerson을 제외
-                    commentAuthors = commentAuthors.filter(author => author !== lastPerson);
+                    participants = participants.filter(author => author !== lastPerson);
                 }
             }
         }
-
         //짝수가 되었으면
         //맞찌름 불러오기 [[d,e], [f,g]]
         let mutualPairs = await findMutualPairs(post_key);
         //맞찌름 목록 중 중도삭제자 제외, 참여자만 남김
         mutualPairs = await checkParticipate(mutualPairs, participants);
         //선찌름 불러오기 [h, i, j]
-        let oneSidedPairs = await findOnesidedPairs(post_key);
-        //자찌름 목록 중 중도삭제자 제외, 참여자만 남김
+        let oneSidedPairs = await findOnesidedPairs(post_key);    
+        //선찌름 목록 중 중도삭제자 제외, 참여자만 남김
         oneSidedPairs = await checkParticipate(oneSidedPairs, participants);
-
         // 유저키 목록 추출
         const selfPairsId = new Set(selfPairs.map(selfPair => selfPair.user_key));
         const mutualPairsId = new Set(mutualPairs.flatMap(mutualPair => [
@@ -352,7 +356,7 @@ async function makeFinalPairs(access_token, band_key, post_key) {
         //페어 매칭
         // 참가자 필터링 (ID 목록과 비교)
         const filteredParticipants = participants.filter(participant => {
-            const userKey = participant.user_key;
+            const userKey = participant.author.user_key;
 
             // 자찌름, 맞찌름, 선찌름에 포함되지 않은 참가자만 필터링
             return !selfPairsId.has(userKey) &&
@@ -365,8 +369,7 @@ async function makeFinalPairs(access_token, band_key, post_key) {
         let finalPairs = [];
         //자찌름을 finalPairs에 추가
         selfPairs.forEach(selfPair => {
-            const matchingParticipant = participants.find(participant => participant.user_key === selfPair.user_key);
-
+            const matchingParticipant = participants.find(participant => {return participant.author.user_key === selfPair.user_key});
             if (matchingParticipant) {
                 // [A, A] 형식으로 추가
                 finalPairs.push([matchingParticipant, matchingParticipant]);
@@ -375,17 +378,17 @@ async function makeFinalPairs(access_token, band_key, post_key) {
         //맞찌름을 finalPairs에 추가
         mutualPairs.forEach(mutualPair => {
             const matchingParticipants = mutualPair.map(pair =>
-                participants.find(participant => participant.user_key === pair.user_key)
+                participants.find(participant => participant.author.user_key === pair.user_key)
             );
 
-            if (matchingParticipant){
+            if (matchingParticipants) {
                 finalPairs.push(matchingParticipants);
             }
         });
         //선찌름을 finalPairs에 추가
         oneSidedPairs.forEach(oneSidedPair => {
-            const matchingParticipant = participants.find(participant => participant.user_key === oneSidedPair.user_key);
-            const matchingParticipant2 = participants.find(participant => participant.user_key === oneSidedPair.opponent_key);
+            const matchingParticipant = participants.find(participant => participant.author.user_key === oneSidedPair.user_key);
+            const matchingParticipant2 = participants.find(participant => participant.author.user_key === oneSidedPair.opponent_key);
 
             if (matchingParticipant && matchingParticipant2) {
                 finalPairs.push([matchingParticipant, matchingParticipant2]);
@@ -399,7 +402,7 @@ async function makeFinalPairs(access_token, band_key, post_key) {
 
         return finalPairs;
     } catch (error) {
-        console.error('Error making random pairs excluded one-sided pairs:', error);
+        console.error('Error making random pairs :', error);
     }
 }
 

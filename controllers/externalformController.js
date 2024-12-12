@@ -12,11 +12,14 @@ const jwtSecret = process.env.JWT_SECRET;
 //외부자 메인
 const getExternalPairgame = async (req, res) => {
     try {
+        // 현재 시간이 access_restricted_at을 넘었는지 확인
+        //존재하지 않을 시 이동
         const band_key = req.params.band_key;
         const existlink = await findTempLinkbyBandKey(band_key);
-        if (!existlink) { //페이지 만료 or 존재하지 않을 시 이동
+        const now = new Date();
+        if (now > existlink.access_restricted_at || !existlink) {
             console.log('expired link');
-            return res.render('externalexpired');
+            return res.redirect('/external/expired');
         }
 
         //만료되지 않은 링크라면
@@ -51,6 +54,16 @@ const getExternalPairgame = async (req, res) => {
 //링크 연결
 const getExternalPairformLink = async (req, res) => {
     try {
+        // 현재 시간이 access_restricted_at을 넘었는지 확인
+        //존재하지 않을 시 이동
+        const band_key = req.session.band_key;
+        const existlink = await findTempLinkbyBandKey(band_key);
+        const now = new Date();
+        if (now > existlink.access_restricted_at || !existlink) {
+            console.log('expired link');
+            return res.redirect('/external/expired');
+        }
+
         //주어진 링크를 타고 온 외부인인지 확인
         const external = req.session.external;
         if (!external) {
@@ -59,7 +72,6 @@ const getExternalPairformLink = async (req, res) => {
         }
 
         //정식 링크를 타고 온 외부인이 맞다면
-        const band_key = req.session.band_key;
         const notice_id = req.session.notice_id;
 
         if (!band_key || !notice_id) {
@@ -109,12 +121,21 @@ const getExternalPairformLink = async (req, res) => {
 //신청 페이지 불러오기
 const getExternalPairform = async (req, res) => {
     try {
+        // 현재 시간이 access_restricted_at을 넘었는지 확인
+        //존재하지 않을 시 이동
+        const band_key = req.session.band_key;
+        const existlink = await findTempLinkbyBandKey(band_key);
+        const now = new Date();
+        if (now > existlink.access_restricted_at || !existlink) {
+            console.log('expired link');
+            return res.redirect('/external/expired');
+        }
+
         //현재 접속자 이름
         const character = req.session.character;
         const bandname = req.session.band_name;
         //현재 게임 참여자 목록 불러오기
         const access_token = req.session.access_token;
-        const band_key = req.session.band_key;
         const notice_id = req.session.notice_id;
 
         if (!character || !access_token || !band_key || !notice_id) {
@@ -139,12 +160,21 @@ const getExternalPairform = async (req, res) => {
 //찌름 완료
 const postExternalPairform = async (req, res) => {
     try{
+        // 현재 시간이 access_restricted_at을 넘었는지 확인
+        //존재하지 않을 시 이동
+        const band_key = req.session.band_key;
+        const existlink = await findTempLinkbyBandKey(band_key);
+        const now = new Date();
+        if (now > existlink.access_restricted_at || !existlink) {
+            console.log('expired link');
+            return res.redirect('/external/expired');
+        }
+
         const bandname = req.session.band_name;
 
         //받은 데이터
         const opponent_name = req.body.opponent_name; // 배열로 전송된 participants
         const opponent_key = req.body.opponent_key; // 선택된 캐릭터
-        const band_key = req.session.band_key;
         const post_key = req.session.notice_id;
         const user_name = req.session.character;
         const user_key = req.session.user_key;
@@ -175,4 +205,13 @@ const postExternalPairform = async (req, res) => {
     }
 }
 
-module.exports = { getExternalPairform, getExternalPairgame, getExternalPairformLink, postExternalPairform };
+const getExternalExpired = async (req, res)=>{
+    try{
+        res.render('externalexpired');
+    }
+    catch(error){
+
+    }
+}
+
+module.exports = { getExternalPairform, getExternalPairgame, getExternalPairformLink, postExternalPairform, getExternalExpired };

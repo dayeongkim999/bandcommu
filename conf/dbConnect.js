@@ -6,8 +6,8 @@ const dbConnect = async () => {
     try{
         const connect = await mongoose.connect(process.env.DB_CONNECT);
         console.log("DB connected");
-        // Change Stream 감시 시작
-        watchTTLDeletion();
+        // Change Stream 감시 시작 사용X
+        //watchTTLDeletion();
     } catch(err){  
         console.log(err);
     }

@@ -54,7 +54,7 @@ const commentListApi = {
                     break; // nextParams가 유효하지 않으면 루프 종료
                 }
 
-                const pagingOptions = this.getContentPagingUrl(nextParams);
+                const pagingOptions = this.getCommentPagingUrl(nextParams);
                 response = await axios(pagingOptions);
 
                 ({ result_code, result_data } = response.data);
@@ -120,7 +120,7 @@ const commentListApi = {
                     break; // nextParams가 유효하지 않으면 루프 종료
                 }
 
-                const pagingOptions = this.getContentPagingUrl(nextParams);
+                const pagingOptions = this.getCommentPagingUrl(nextParams);
                 response = await axios(pagingOptions);
 
                 ({ result_code, result_data } = response.data);
@@ -183,7 +183,7 @@ const commentListApi = {
             // return authorInfo; // 댓글 목록 반환
         } catch (error) {
             if (error.response) {
-                console.log('Cannot fetch band content list : ' + error.response.status);
+                console.log('Cannot fetch band comment list : ' + error.response.status);
             } else {
                 console.log('Error:', error.message);
             }
