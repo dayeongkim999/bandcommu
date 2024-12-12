@@ -88,6 +88,9 @@ const getBandPairGameNow = async (req, res) => {
         const band = bandList.bands.find(b => b.band_key === bandKey); // 해당 밴드 찾기
         const link = await handleTempLink(existingURL.token);
 
+        req.session.post_key = req.params.post_key;
+        req.session.band_key = req.params.band_key;
+
         // 있을 시
         // 렌더링
         res.render('bandpairgamenow', { bandKey, postKey, bandname: band.name, expires_at: existingURL.expires_at, link, baseUrl });
@@ -149,8 +152,8 @@ async function getPairgameData(req, res) {
 async function getPairgameCompleteLink(req, res) {
     try {
         //해당 공지 글의 찌름 마감 시간이 지났나 확인
-        const bandKey = req.params.band_key;
-        const postKey = req.params.post_key;
+        const bandKey = req.session.band_key;
+        const postKey = req.session.post_key;
         const link = await findTempLinkbyBandKey(bandKey);
         const access_restricted_at = link.access_restricted_at;
         const now = new Date();
