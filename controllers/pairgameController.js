@@ -80,7 +80,12 @@ const getBandPairGameNow = async (req, res) => {
         if (!existingURL) {
             // 존재하지 않으면 링크 생성
             const noticeId = postKey
-            const expired_hour = 23, expired_minute = 59, access_hour = 2, access_minute = 51;
+            //개발 테스트용
+            const now = new Date(); // 현재 시간
+            now.setMinutes(now.getMinutes() + 5); // 현재 시간에 5분 추가
+            const access_hour = now.getHours(), access_minute = now.getMinutes();
+            now.setMinutes(now.getMinutes() + 5); // 현재 시간에 5분 추가
+            const expired_hour = now.getHours(), expired_minute = now.getMinutes();
             existingURL = await createTempLink(noticeId, bandKey, bandCover, bandName, expired_hour, expired_minute, access_hour, access_minute);
         }
 
