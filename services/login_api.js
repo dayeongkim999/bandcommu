@@ -1,4 +1,5 @@
 const os = require('os');
+require('dotenv').config();
 
 let loginApi = {
     CLIENT_ID : process.env.CLIENT_ID,

@@ -27,7 +27,7 @@
             <a href="/main/<%= bandKey %>" class="_linkLnbMenu groupBandMenuLink">통계</a>
         </li> -->
         <li class="groupBandMenuItem">
-            <a href="https://localhost:8080/main/<%= bandKey %>/pairgame/<%= postKey%>" class="_linkLnbMenu groupBandMenuLink sf_color sf_tAfterBg">페어게임</a>
+            <a href="<%= baseUrl%>/main/<%= bandKey %>/pairgame/<%= postKey%>" class="_linkLnbMenu groupBandMenuLink sf_color sf_tAfterBg">페어게임</a>
         </li>
         <!-- <li class="groupBandMenuItem">
             <a href="/main/<%= bandKey %>/dice" class="_linkLnbMenu groupBandMenuLink">다이스</a>
@@ -50,7 +50,7 @@
                         <div>
                             <button class="btn btn-primary" id="access-button" disabled>결과 확인 후 글 작성하기</button>
                         </div>
-                        <a href="https://localhost:8080<%= link%>" class="">https://localhost:8080<%= link%></a>
+                        <a href="<%= baseUrl%><%= link%>" class=""><%= baseUrl%><%= link%></a>
                         <ul id="pairgame-list" class="list-group">
                             <!-- AJAX로 데이터 로드 -->
                         </ul>

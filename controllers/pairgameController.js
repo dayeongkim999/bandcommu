@@ -90,7 +90,7 @@ const getBandPairGameNow = async (req, res) => {
 
         // 있을 시
         // 렌더링
-        res.render('bandpairgamenow', { bandKey, postKey, bandname: band.name, expires_at: existingURL.expires_at, link });
+        res.render('bandpairgamenow', { bandKey, postKey, bandname: band.name, expires_at: existingURL.expires_at, link, baseUrl });
     } catch (error) {
         if (error.response) {
             console.log('Error fetching notice data: ' + error.response.status);
@@ -186,7 +186,7 @@ async function getBandPairGameComplete(req, res){
         const content = await writingPair(access_token, band_key, post_key);
         const formattedContent = content.replace(/\n/g, '<br>');
         //화면에 보여줌
-        res.render('bandpairgameresult', {formattedContent, bandKey: band_key, postKey: post_key, bandname});
+        res.render('bandpairgameresult', {formattedContent, bandKey: band_key, postKey: post_key, bandname, baseUrl});
     } catch(error){
         console.error('Error get pair game complete:', error);
     }
