@@ -45,7 +45,7 @@ async function registerUser(event) {
     }
 }
 
-document.getElementById("registerForm").addEventListener("submit", registerUser, { once: true });
+document.getElementById("registerUser").addEventListener("submit", registerUser, { once: true });
 
 
 async function deleteUser(event, userId) {
