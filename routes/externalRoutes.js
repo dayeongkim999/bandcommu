@@ -1,11 +1,19 @@
 const router = require('express').Router();
 require('dotenv').config({path: '../conf/.env'});
+const checkBand= require('../middlewares/checkBand');
 const {
-    getIndexPage,
-} = require("../controllers/indexController")
+    getExternalPairform,
+    getExternalPairgame,
+    getExternalPairformLink,
+    postExternalPairform
+} = require("../controllers/externalformController")
 
 
 //메인 화면
-router.route("/").get(getIndexPage);
+router.route("/pairgame/:notice_id/:band_key").get(getExternalPairgame);
+router.route("/pairformlink").get(getExternalPairformLink);
+router.route("/pairform/:notice_id/:band_key")
+    .get(checkBand, getExternalPairform)
+    .post(checkBand, postExternalPairform);
 
 module.exports = router;

@@ -17,15 +17,15 @@
   </nav>
   <div class="groupBandMenuSection custom_nav"> 
     <ul class="groupBandMenuList">
-        <li class="groupBandMenuItem">
+        <!-- <li class="groupBandMenuItem">
             <a href="/main/<%= bandkey %>" class="_linkLnbMenu groupBandMenuLink">통계</a>
-        </li>
+        </li> -->
         <li class="groupBandMenuItem">
             <a href="/main/<%= bandkey %>/pairgame" class="_linkLnbMenu groupBandMenuLink sf_color sf_tAfterBg">페어게임</a>
         </li>
-        <li class="groupBandMenuItem">
+        <!-- <li class="groupBandMenuItem">
             <a href="/main/<%= bandkey %>/dice" class="_linkLnbMenu groupBandMenuLink">다이스</a>
-        </li>
+        </li> -->
     </ul>
   </div>
 </div>
@@ -37,11 +37,13 @@
 
                 </h3>
                 <ul>
-            <% contentList.forEach(function(item) { %>
+            <% noticeList.forEach(function(item) { %>
                 <li>
-                    <h2>작성자: <%= item.author.name %></h2>
-                    <p>내용: <%- item.content %></p> <!-- HTML 태그 포함 -->
-                    <p>작성일: <%= new Date(item.created_at).toLocaleString() %></p>
+                    <a href="/main/<%= item.band_key%>/pairgame/<%= item.post_key %>" style="text-decoration: none; color: inherit; display: block;">
+                        <h2>작성자: <%= item.author.name %></h2>
+                        <p>내용: <%- item.content %></p> <!-- HTML 태그 포함 -->
+                        <p>작성일: <%= new Date(item.created_at).toLocaleString() %></p>
+                    </a>
                 </li>
             <% }); %>
         </ul>

@@ -11,6 +11,7 @@ const helmet = require('helmet');
 const cors = require("cors");
 const methodOverride = require("method-override");
 const dbConnect = require("./conf/dbConnect");
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const httpPort = 9131;
@@ -24,6 +25,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(methodOverride("_method"));
+app.use(cookieParser());
 
 app.set('view engine', 'ejs');
 app.set('views', './views');
@@ -49,7 +51,15 @@ app.use(express.static(staticPath));
 app.use('/', require("./routes/indexRoutes"));
 app.use('/login', require('./routes/loginRoutes'));
 app.use('/main', require("./routes/mainRoutes"));
+app.use('/api/pairgame', require("./routes/api/pairgame")); // /api/pairgame 경로와 라우터 연결
+app.use('/external', require("./routes/externalRoutes"));
 
+app.use((req, res, next) => {
+    if (!req.secure) {
+      return res.redirect(`https://${req.headers.host}${req.url}`);
+    }
+    next();
+  });
 
 // HSTS 설정 (1년 동안 HTTPS 강제)
 app.use(helmet.hsts({
@@ -68,12 +78,3 @@ const sslOptions = {
 https.createServer(sslOptions, app).listen(httpsPort, () => {
     console.log(`HTTPS server running on https://localhost:${httpsPort}`);
 });
-
-// HTTP 서버: HTTPS로 리다이렉트 / 로컬 전용
-http.createServer((req, res) => {
-    res.writeHead(301, { Location: `https://localhost:${httpsPort}${req.url}` });
-    res.end();
-}).listen(httpPort, () => {
-    console.log(`HTTP server running on port ${httpPort} (redirecting to HTTPS)`);
-});
-

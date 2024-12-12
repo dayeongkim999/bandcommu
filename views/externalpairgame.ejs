@@ -1,6 +1,7 @@
 <!-- include head -->
 <%- include('./include/_head') %>
     <!-- /include head -->
+    <link href="/stylesheets/mainpage.css" rel="stylesheet">
     <link href="/stylesheets/banddetail.css" rel="stylesheet">
     </head>
 <body>
@@ -12,29 +13,26 @@
         <a href="/main" class="back-icon" role="button">
             &#60; <!-- '<' 아이콘 -->
         </a>
-        <span class="band-name"><%= bandname %></span>
+        <span class="band-name"><%= band_name %></span>
     </div>
   </nav>
-  <div class="groupBandMenuSection custom_nav"> 
-    <ul class="groupBandMenuList">
-        <li class="groupBandMenuItem">
-            <a href="/main/<%= bandkey %>" class="_linkLnbMenu groupBandMenuLink sf_color sf_tAfterBg">통계</a>
-        </li>
-        <li class="groupBandMenuItem">
-            <a href="/main/<%= bandkey %>/pairgame" class="_linkLnbMenu groupBandMenuLink">페어게임</a>
-        </li>
-    </ul>
-  </div>
 </div>
   <!-- /Header -->
         <main>
             <div class="IntroBodyView">
-            <div>
-
-            </div>
-            <div>
-                
-            </div>
+            <div class="bandMemberArea">
+                <h1>페어게임 찌름 신청</h1>
+                <p>아래 밴드에서 진행되는 페어게임의 찌름 신청을 받습니다.</p>
+                <!--밴드 커버-->
+                <div class="band bandCardItem">
+                        <img src="<%= band_cover %>" alt="<%= band_name %> Cover">
+                        <div class="band-name">
+                            <%= band_name %>
+                        </div>
+                </div>
+        <!-- 로그인 버튼 -->
+        <a href="<%= bandLoginUrl %>" class="btn btn-primary btn-lg loginButton">Band로 로그인</a>
+         </div>
         </div>
         </main>
 

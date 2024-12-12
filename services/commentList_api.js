@@ -5,43 +5,41 @@ const axios = require("axios");
 
 const commentListApi = {
     getCommentListUrl: function (access_token, band_key, post_key) {
-        const contentListUrl = loginApi.COMMENT_LIST_URL +
+        const commentListUrl = loginApi.COMMENT_LIST_URL +
             '?access_token=' + encodeURIComponent(access_token) +
             '&band_key=' + encodeURIComponent(band_key) +
-            '&post_key' + encodeURIComponent(post_key);
+            '&post_key=' + encodeURIComponent(post_key);
         const options = {
-            url: contentListUrl,
+            url: commentListUrl,
             headers: { Authorization: 'Bearer ' + access_token } // Bearer 토큰 설정
         };
         return options;
     },
     getCommentPagingUrl: function (next_params) {
-        const contentPagingUrl = loginApi.POST_LIST_URL + '?after=' + next_params.after + '&limit=' + next_params.limit + '&access_token=' + next_params.access_token + "&band_key=" + next_params.band_key;
+        const commentPagingUrl = loginApi.COMMENT_LIST_URL + '?after=' + next_params.after + '&limit=' + next_params.limit + '&access_token=' + next_params.access_token + "&band_key=" + next_params.band_key + "&post_key" + next_params.post_key;
         const options = {
-            url: contentPagingUrl,
+            url: commentPagingUrl,
             headers: { Authorization: 'Bearer ' + next_params.access_token } // Bearer 토큰 설정
         };
         return options;
     },
-    getCommentAuthorList: async function (access_token, band_key) {
+    getAllParticipants: async function (access_token, band_key, post_key) {
         let commentAuthors = [];
         let nextParams = null;
         try {
             //요청 보내고 받기
-            const options = this.getContentListUrl(access_token, band_key);
+            const options = this.getCommentListUrl(access_token, band_key, post_key);
             let response = await axios(options);
             let result_code = response.data.result_code;
             const body = response.data.result_data;
 
             if (result_code !== 1) {
-                console.log('Naver band content list get error');
+                console.log('Naver band comment list get error');
                 return { redirect: "/?resultCd=L" }; // 실패 시 리다이렉트 경로 반환
             }
 
-            // 댓글 목록 순회하며 본문 첫 줄에 #홀수참여, #홀수제외, #마감이 있는지 확인
-            let oddAddItems = await findTagInPosts(body.items, '#홀수참여');
-            let oddMinusItems = await findTagInPosts(body.items, '#홀수제외');
-            let deadLineItem = await findTagInPosts(body.items, '#마감');
+            // 댓글 목록 순회하며 본문 첫 줄에 #마감이 있는지 확인
+            let deadLineItem = await findTagInPosts(body.items, '#마감') || [];
 
             // 리스트에 추가
             commentAuthors = commentAuthors.concat(body.items);
@@ -62,7 +60,73 @@ const commentListApi = {
                 ({ result_code, result_data } = response.data);
 
                 if (result_code !== 1) {
-                    console.log('Naver band content list get error during paging');
+                    console.log('Naver band comment list get error during paging');
+                    break;
+                }
+
+                // 리스트에 추가
+                commentAuthors = commentAuthors.concat(result_data.items);
+
+                // 댓글 목록 순회하며 본문 첫 줄에 #마감이 있는지 확인
+                deadLineItem = deadLineItem.concat(await findTagInPosts(result_data.items, '#마감'));
+
+                // 다음 페이징 정보 업데이트
+                nextParams = result_data.paging.next_params || null;
+            }
+
+            //마감 글 제외
+            commentAuthors = commentAuthors.filter(author => !deadLineItem.includes(author));
+            return commentAuthors;
+        } catch (error) {
+            if (error.response) {
+                console.log('Cannot fetch band comment list : ' + error.response.status);
+            } else {
+                console.log('Error:', error.message);
+            }
+            console.error(error);
+            return null; // 에러 발생 시 null 반환
+        }
+    },
+    getExcludedOddParticipants: async function (access_token, band_key, post_key) {
+        let commentAuthors = [];
+        let nextParams = null;
+        try {
+            //요청 보내고 받기
+            const options = this.getCommentListUrl(access_token, band_key, post_key);
+            let response = await axios(options);
+            let result_code = response.data.result_code;
+            const body = response.data.result_data;
+
+            if (result_code !== 1) {
+                console.log('Naver band comment list get error');
+                return { redirect: "/?resultCd=L" }; // 실패 시 리다이렉트 경로 반환
+            }
+
+            // 댓글 목록 순회하며 본문 첫 줄에 #홀수참여, #홀수제외, #마감이 있는지 확인
+            let oddAddItems = await findTagInPosts(body.items, '#홀수참여') || [];
+            let oddMinusItems = await findTagInPosts(body.items, '#홀수제외') || [];
+            let deadLineItem = await findTagInPosts(body.items, '#마감') || [];
+
+            // 리스트에 추가
+            commentAuthors = commentAuthors.concat(body.items);
+
+            // 페이징 정보 추출
+            nextParams = body.paging.next_params || null;
+
+            // 페이징 처리 루프
+            while (nextParams) {
+                if (!nextParams.limit) {
+                    console.log('Invalid nextParams:', nextParams);
+                    break; // nextParams가 유효하지 않으면 루프 종료
+                }
+
+                const pagingOptions = this.getContentPagingUrl(nextParams);
+                response = await axios(pagingOptions);
+
+                ({ result_code, result_data } = response.data);
+
+                if (result_code !== 1) {
+                    console.log('Naver band comment list get error during paging');
                     break;
                 }
 
@@ -80,7 +144,7 @@ const commentListApi = {
             }
 
             //마감 글 제외
-            commentAuthors = commentAuthors.filter(author => !deadlineItem.includes(author));
+            commentAuthors = commentAuthors.filter(author => !deadLineItem.includes(author));
 
             //이후 홀수라면
             if (commentAuthors.length % 2 == 1) {
@@ -110,7 +174,13 @@ const commentListApi = {
                 }
             }
 
-            return commentAuthors; // 최근 2일 이내의 글 목록 반환
+            return commentAuthors;
+            // const authorInfo = commentAuthors.map(comment => {
+            //     const {name, user_key} = comment.author;
+            //     return {name, user_key};
+            // });
+
+            // return authorInfo; // 댓글 목록 반환
         } catch (error) {
             if (error.response) {
                 console.log('Cannot fetch band content list : ' + error.response.status);

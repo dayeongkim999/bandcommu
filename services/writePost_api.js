@@ -3,21 +3,22 @@ const findNoticesInPosts = require('./postParser');
 const axios = require("axios");
 
 const writePostApi = {
-    getWritePostUrl: function (access_token, band_key, content) {
+    postWritePostUrl: function (access_token, band_key, content) {
         const writePostUrl = loginApi.POST_CREATE_URL +
             '?access_token=' + encodeURIComponent(access_token) +
             '&band_key=' + encodeURIComponent(band_key)+
-            '&conten=' + encodeURIComponent(content);
+            '&content=' + encodeURIComponent(content);
         const options = {
             url: writePostUrl,
-            headers: { Authorization: 'Bearer ' + access_token } // Bearer 토큰 설정
+            headers: { Authorization: 'Bearer ' + access_token },
+            method: "POST", // Bearer 토큰 설정
         };
         return options;
     },
     writePost: async function (access_token, band_key, content){
         try{
             //요청 보내기
-            const options = this.getWritePostUrl(access_token, band_key, content);
+            const options = this.postWritePostUrl(access_token, band_key, content);
             let response = await axios(options);
             let result_code = response.data.result_code;
             const body = response.data.result_data;

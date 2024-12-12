@@ -30,38 +30,47 @@ const getLogin = async (req, res) => {
         req.session.access_token = data.access_token;
         const user_key = data.user_key;
 
-        //로그인 성공 시
-        //최초접속 확인: 인증을 했던 사용자는 user_key 소유 
-        const user = await findUserByUserkey(user_key);
-        if (!user) {//인증 안 된 최초 접속자라면
-            // 세션에서 nickname 가져오기
-            const nickname = req.session.nickname;
-            if(!nickname) return res.redirect('/?resultCd=L');
-            //authCode 사용 처리 및 user key 업데이트
-            const isUpdate = await updateUserByNickname(nickname, user_key);
-            if(!isUpdate) return res.redirect('/?resultCd=L');
+        //밴드 로그인 성공 시
+        //접속 경로 구분
+        const external = req.session.external;
+        console.log(external);
+        //유저임(external이 true)        
+        if (external === true) {
+            res.redirect('/external/pairformlink');
         }
+        else if (external === false) {
+            //관리진임
+            //최초접속 확인: 인증을 했던 사용자는 user_key 소유 
+            const user = await findUserByUserkey(user_key);
+            if (!user) {//인증 안 된 최초 접속자라면
+                //authCode 사용 처리 및 user key 업데이트
+                const isUpdate = await updateUserByNickname(nickname, user_key);
+                if (!isUpdate) return res.redirect('/?resultCd=L');
+            }
 
-        //최초 접속자가 아니면 기존 user_key와 현재 user_key 비교
-        if(!(user_key === user.user_key)){
+            //최초 접속자가 아니면 기존 user_key와 현재 user_key 비교
+            if (!(user_key === user.user_key)) {
+                return res.redirect('/?resultCd=L');
+            }
+
+            //access token 발급
+            const token = jwt.sign({ manager: true, id: user._id }, jwtSecret, { expiresIn: '1d' });
+            res.cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+
+            //발급 시간 연월로 변경
+            let now = new Date();
+            let accessTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ` +
+                `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            //token 발급 시간 db에 업뎃
+            updateAccessTime(user, accessTime);
+
+            //메인으로
+            res.redirect('/main');
+        }
+        else{
+            console.log("external error");
             return res.redirect('/?resultCd=L');
-        }
-
-        //access token 발급
-        const token = jwt.sign({id: user._id}, jwtSecret,  { expiresIn: '1d' });
-        res.cookie("token", token, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000});
-
-        //발급 시간 연월로 변경
-        let now = new Date();
-        let accessTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ` +
-                 `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-        //token 발급 시간 db에 업뎃
-        updateAccessTime(user, accessTime);
-        
-        
-
-        //메인으로
-        res.redirect('/main');
+        } 
 
     } catch (error) {
         if (error.response) {
@@ -94,14 +103,16 @@ const authUser = async (req, res) => {
                 redirectUrl: '/?resultCd=L',
             });
         }
-        //존재한다면 인증한 적 있는지 확인
+        //존재한다면 관리진으로 저장
+        req.session.external = false;
+        //인증한 적 있는지 확인
         //인증 한 적이 있다면
-        if(user.isVerified){
+        if (user.isVerified) {
             let bandLoginUrl = await loginApi.getLoginUrl();
             res.json({ success: true, redirectUrl: bandLoginUrl }); // Band 로그인 URL 반환
         }
         //인증 한 적이 없다면
-        else{
+        else {
             //인증 코드 비교
             const check = await verifyAuthcode(authCode, user.hashCode);
 
@@ -180,7 +191,7 @@ const deleteUser = async (req, res) => {
     try {
         const userId = req.params.id;
         await Authcode.findByIdAndDelete(userId); // MongoDB에서 해당 유저 삭제
-        
+
         res.status(200).json({
             success: true,
             message: "User deleted successfully",

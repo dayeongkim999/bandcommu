@@ -3,9 +3,10 @@ const { v4: uuidv4 } = require('uuid'); //v4: 외부정보에 의존하지 않�
 
 const templinkSchema = new mongoose.Schema({
     token: { type: String, required: true },
-    notice_id: { type: Number, required: true },
-    user_id: { type: String, required: true},
-    created_at: { type: Date, default: Date.now },
+    notice_id: { type: String, required: true },
+    band_key: { type: String, required: true},
+    band_cover: {type: String, required: true},
+    band_name: {type: String, required: true},
     expires_at: { type: Date, required: true },
 },
 {
@@ -13,20 +14,21 @@ const templinkSchema = new mongoose.Schema({
 });
 
 // TTL 인덱스 설정
-TempLinkSchema.index({ expires_at: 1 }, { expireAfterSeconds: 0 });
+templinkSchema.index({ expires_at: 1 }, { expireAfterSeconds: 0 });
 
-const TempLink = mongoose.model('TempLink', TempLinkSchema);
+const TempLink = mongoose.model('TempLink', templinkSchema);
 
 
 //링크 생성
-async function createTempLink(notice_id, user_id, expiry_hours = 24) {
+async function createTempLink(notice_id, band_key, band_cover, band_name, hour = 23, minute = 30) {
     const token = uuidv4();
-    const expires_at = new Date(Date.now() + expiry_hours * 60 * 60 * 1000);
+    const now = new Date(); // 현재 시각을 정의
+    const expires_at = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0); // 당일 오후 11시 30분
 
-    const tempLink = new TempLink({ token, notice_id, user_id, expires_at });
+    const tempLink = new TempLink({ token, notice_id, band_key, band_cover, band_name, expires_at });
     await tempLink.save();
 
-    return `/external/pairgame/${token}`;
+    return tempLink;
 }
 
 //링크 사용가능 확인
@@ -41,23 +43,19 @@ async function handleTempLink(token) {
         throw new Error('Link already used');
     }
 
-    return tempLink;
+    return `/external/pairgame/${tempLink.notice_id}/${tempLink.band_key}`;
 }
 
 //존재하나 찾기
-async function findTempLinkbyUserId(user_id) {
-    const tempLink = await TempLink.findOne({ user_id });
+async function findTempLinkbyBandKey(band_key) {
+    const tempLink = await TempLink.findOne({ band_key: band_key });
 
     if (!tempLink) {
-        throw new Error('Link not found');
+        return null;
     }
 
-    if (tempLink.is_used) {
-        throw new Error('Link already used');
-    }
-
-    return tempLink.notice_id;
+    return tempLink;
 }
 
 
-module.exports = {TempLink, createTempLink, handleTempLink, findTempLinkbyUserId};
+module.exports = {TempLink, createTempLink, handleTempLink, findTempLinkbyBandKey};

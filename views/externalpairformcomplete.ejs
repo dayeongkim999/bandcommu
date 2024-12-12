@@ -1,0 +1,43 @@
+<!-- include head -->
+<%- include('./include/_head') %>
+    <!-- /include head -->
+    <link href="/stylesheets/banddetail.css" rel="stylesheet">
+    <link href="/stylesheets/externalpairform.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-latest.min.js" crossorigin="anonymous"></script>
+    <script src="/javascripts/pairgamenow.js" defer></script>
+
+    </head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+   <!-- Header -->
+  <div class="_body_background">
+   <nav class="navbar custom_nav" style="background-color: #74BA77;">
+    <div class="container-fluid">
+    </div>
+  </nav>
+</div>
+  <!-- /Header -->
+        <main>
+            <div class="IntroBodyView">
+            <div class="bandMemberArea">
+                <h1 class="title">페어게임 신청 완료</h1>
+                <p class="title">신청 시각: <%= new Date(pair.updatedAt).toLocaleString('en-US', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit', 
+                    hour12: false 
+                }) %></p>
+                <h4 class="title"><%= pair.user_name%>님</h1>
+                <h4 class="title">-></h1>
+                <h4 class="title"><%= pair.opponent_name%>님</h1>
+                <p class="title">찌름 신청 완료 되었습니다.</p>
+            </div>
+        </div>
+        </main>
+
+        <!-- include footer -->
+        <%- include('./include/_footer') %>
+            <!-- /include footer -->

@@ -1,0 +1,41 @@
+.title{
+    margin: 30px; /* 여백 제거 */
+    font-weight: bold; /* 굵은 텍스트 */
+    color: #333; /* 텍스트 색상 */
+    text-align: center;
+}
+
+.character-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.profile-image img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.character-name {
+    flex: 1; /* 이름 컨테이너가 공간을 유연하게 차지 */
+    min-width: 210px; /* 최소 너비를 100px로 설정 */
+    overflow: hidden; /* 텍스트가 길 경우 넘어가는 부분 숨김 */
+    text-overflow: ellipsis; /* 텍스트 줄임표 추가 */
+    white-space: nowrap; /* 한 줄로 표시 */
+}
+
+.radio-button {
+    margin-left: 10px;
+}
+
+.btncolor{
+    font-family: var(--global-titlefont);
+    --bs-btn-bg: var(--global-color);
+    --bs-btn-border-color: ;
+    --bs-btn-hover-bg: var(--global-darkcolor);
+    --bs-btn-hover-border-color: ;
+    --bs-btn-active-bg: var(--global-darkcolor);
+    --bs-btn-active-border-color: var(--global-darkcolor);
+}

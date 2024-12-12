@@ -12,6 +12,11 @@ const checkLogin = async (req, res, next) => {
 
     try{
         const decoded = jwt.verify(token, jwtSecret);
+        // manager가 true인지 확인
+        if (decoded.manager !== true) {
+            // manager가 아니라면 특정 URL로 리다이렉트
+            return res.redirect("/?resultCd=L");
+        }
         req.username = decoded.username;
         next();
     } catch(error){

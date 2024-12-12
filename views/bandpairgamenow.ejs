@@ -1,0 +1,60 @@
+<!-- include head -->
+<%- include('./include/_head') %>
+    <!-- /include head -->
+    <link href="/stylesheets/banddetail.css" rel="stylesheet">
+    <link href="/stylesheets/pairgamenow.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-latest.min.js" crossorigin="anonymous"></script>
+    <script src="/javascripts/pairgamenow.js" defer></script>
+    <script>var postKey = "<%=postKey%>";</script>
+    </head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+   <!-- Header -->
+  <div class="_body_background">
+   <nav class="navbar custom_nav" style="background-color: #74BA77;">
+    <div class="container-fluid">
+        <a href="/main" class="back-icon" role="button">
+            &#60; <!-- '<' 아이콘 -->
+        </a>
+        <span class="band-name"><%= bandname %></span>
+    </div>
+  </nav>
+  <div class="groupBandMenuSection custom_nav"> 
+    <ul class="groupBandMenuList">
+        <!-- <li class="groupBandMenuItem">
+            <a href="/main/<%= bandKey %>" class="_linkLnbMenu groupBandMenuLink">통계</a>
+        </li> -->
+        <li class="groupBandMenuItem">
+            <a href="https://localhost:8080/main/<%= bandKey %>/pairgame/<%= postKey%>" class="_linkLnbMenu groupBandMenuLink sf_color sf_tAfterBg">페어게임</a>
+        </li>
+        <!-- <li class="groupBandMenuItem">
+            <a href="/main/<%= bandKey %>/dice" class="_linkLnbMenu groupBandMenuLink">다이스</a>
+        </li> -->
+    </ul>
+  </div>
+</div>
+  <!-- /Header -->
+        <main>
+            <div class="IntroBodyView">
+            <div class="bandMemberArea">
+                <h1>페어게임 찌름 현황</h1>
+
+                <div class="status-container">
+                    <div id="pairgame-status" class="status">
+                        <div id="time-info">
+                            <p>현재 시각: <span id="current-time"><%= new Date().toLocaleString() %></span></p>
+                            <p>마감 시간: <span id="deadline-time">로딩 중...</span></p>
+                        </div>
+                        <a href="https://localhost:8080<%= link%>" class="">https://localhost:8080<%= link%></a>
+                        <ul id="pairgame-list" class="list-group">
+                            <!-- AJAX로 데이터 로드 -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </main>
+
+        <!-- include footer -->
+        <%- include('./include/_footer') %>
+            <!-- /include footer -->
