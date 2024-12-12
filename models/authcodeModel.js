@@ -75,7 +75,7 @@ const findUserByUserkey = async function(user_key){
 const updateUserByNickname = async function(nickname, user_key){
     try {
         //닉네임이 존재하나 확인
-        const user = findUserByNickname(nickname);
+        const user = await findUserByNickname(nickname);
         console.log("update user" + user);
         if(!user){
             throw new Error(`User with nickname '${nickname}' not found`);
