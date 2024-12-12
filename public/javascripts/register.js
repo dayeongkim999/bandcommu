@@ -1,4 +1,4 @@
-async function registerUser(event) {
+document.getElementById("registerUser").addEventListener("submit", async (event) => {
     event.preventDefault(); // 폼 기본 동작 방지
 
     // 폼 데이터 가져오기
@@ -43,7 +43,7 @@ async function registerUser(event) {
         console.error("Error:", error);
         alert("An error occurred while registering user.");
     }
-}
+})
 
 
 async function deleteUser(event, userId) {
