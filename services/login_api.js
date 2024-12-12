@@ -19,7 +19,7 @@ let loginApi = {
         if(hostname === 'DESKTOP-OIV4OJQ'){
             redirectURI = encodeURI('https://localhost:8080/login/callback'); //개발
         }else{
-            redirectURI = encodeURI(''); //운영
+            redirectURI = encodeURI('https://10.10.15.133:9131/login/callback'); //운영
         }
         return this.AUTHORIZE_URL + '&client_id=' + this.CLIENT_ID + '&redirect_uri=' + redirectURI; 
     },
