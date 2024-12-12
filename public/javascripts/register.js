@@ -45,10 +45,7 @@ async function registerUser(event) {
     }
 }
 
-document.getElementById("registerUser").addEventListener("submit", (event) => {
-    event.preventDefault(); // 기본 동작 방지)
-    });
-    
+
 async function deleteUser(event, userId) {
     event.preventDefault(); // 기본 폼 동작 방지
 
