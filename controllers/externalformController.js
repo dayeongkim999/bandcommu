@@ -25,6 +25,7 @@ const getExternalPairgame = async (req, res) => {
         //만료되지 않은 링크라면
         //세션에 external, band_key, notice_id 저장
         req.session.external = true;
+        await req.session.save();
         
         req.session.band_key = band_key;
         req.session.notice_id = req.params.notice_id;
