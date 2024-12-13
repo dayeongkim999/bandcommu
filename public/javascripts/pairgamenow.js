@@ -1,3 +1,5 @@
+document.addEventListener('DOMContentLoaded', function(){
+
 // AJAX로 찌름 현황 데이터 로드
 function loadPairGameStatus() {
     $.ajax({
@@ -107,4 +109,5 @@ button.addEventListener('click', async () => {
     } catch (error) {
         console.error('Error fetching access:', error);
     }
+});
 });
