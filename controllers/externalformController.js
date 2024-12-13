@@ -99,7 +99,7 @@ const getExternalPairformLink = async (req, res) => {
         }
         //밴드의 멤버임을 인증하는 토큰 발급
         const token = jwt.sign({ member: true, band: band_key }, jwtSecret, { expiresIn: '1d' });
-        res.cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+        await res.cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
         //유저 캐릭터 이름, 유저 키 세션에 저장
         req.session.character = bandprofile.member_name;
