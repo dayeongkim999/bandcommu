@@ -106,6 +106,11 @@ const authUser = async (req, res) => {
         }
         //존재한다면 관리진으로 저장
         req.session.external = false;
+        req.session.save(err => {
+            if (err) throw err;
+            res.redirect(302, '/');
+          });
+
         //인증한 적 있는지 확인
         //인증 한 적이 있다면
         if (user.isVerified) {
